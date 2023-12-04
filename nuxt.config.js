@@ -14,7 +14,7 @@ export default defineNuxtConfig({
             ]
         }
     },
-    modules: ['nuxt-primevue'],
+    modules: ['nuxt-primevue', '@element-plus/nuxt'],
     primevue: {
         options: { ripple: true },
         components: {

@@ -14,7 +14,7 @@ const $primevue = usePrimeVue();
 const rippleActive = computed(() => $primevue.config.ripple);
 const inputStyle = computed(() => $primevue.config.inputStyle);
 
-const scales = ref([12, 13, 14, 15, 16]);
+const scales = ref([13, 14, 15, 16, 17]);
 const visible = ref(false);
 const { changeThemeSettings, setScale, layoutConfig } = useLayout();
 

@@ -1,10 +1,10 @@
 <script setup>
 import { computed, watch, ref } from 'vue';
 import { usePrimeVue } from 'primevue/config';
-import AppTopbar from './AppTopbar.vue';
+import FullTopbar from './FullTopbar.vue';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
-import AppConfig from './AppConfig.vue';
+// import AppConfig from './AppConfig.vue';
 import { useLayout } from './composables/layout';
 
 const $primevue = usePrimeVue();
@@ -63,7 +63,7 @@ const isOutsideClicked = (event) => {
 
 <template>
     <div class="layout-wrapper" :class="containerClass">
-        <app-topbar></app-topbar>
+        <full-topbar></full-topbar>
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
         </div>
@@ -73,7 +73,7 @@ const isOutsideClicked = (event) => {
             </div>
             <app-footer></app-footer>
         </div>
-        <app-config></app-config>
+        <!-- <app-config></app-config> -->
         <div class="layout-mask"></div>
     </div>
 </template>
