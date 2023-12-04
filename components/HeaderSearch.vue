@@ -3,9 +3,11 @@
               <i class="pi pi-search"></i>
               <span>Search</span>
           </button> -->
-  <div class="header-search">
+    <div :class="{'show':show}" class="header-search">
+      <div class="p-link layout-topbar-button">
+        <i class="pi pi-search" @click.stop="click"></i>
+      </div>
     <!-- <svg-icon class-name="search-icon" icon-class="search" @click.stop="click" /> -->
-    <i class="pi pi-search"></i>
     <el-select
       ref="headerSearchSelect"
       v-model="search"
@@ -19,147 +21,13 @@
     >
       <el-option
         v-for="item in options"
-        :key="item.path"
-        :value="item"
-        :label="item.title.join(' > ')"
+        :key="item.item.path"
+        :value="item.item"
+        :label="item.item.title"
       />
     </el-select>
   </div>
 </template>
-
-<script>
-// fuse is a lightweight fuzzy-search module
-// make search results more in line with expectations
-import Fuse from 'fuse.js'
-import path from 'path'
-
-export default {
-    name: 'HeaderSearch',
-    data() {
-        return {
-            search: '',
-            options: [],
-            searchPool: [],
-            show: false,
-            fuse: undefined,
-        }
-    },
-    computed: {
-        routes() {
-            const router = useRouter()
-        return router.getRoutes()
-    //   return this.$store.getters.permission_routes
-    },
-  },
-  watch: {
-    routes() {
-      this.searchPool = this.generateRoutes(this.routes)
-    },
-    searchPool(list) {
-      this.initFuse(list)
-    },
-    show(value) {
-      if (value) {
-        document.body.addEventListener('click', this.close)
-      } else {
-        document.body.removeEventListener('click', this.close)
-      }
-    },
-  },
-  mounted() {
-    this.searchPool = this.generateRoutes(this.routes)
-    console.log(this.searchPool)
-  },
-  methods: {
-    click() {
-      this.show = !this.show
-      if (this.show) {
-        this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.focus()
-      }
-    },
-    close() {
-      this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.blur()
-      this.options = []
-      this.show = false
-    },
-    change(val) {
-      this.$router.push(val.path)
-      this.search = ''
-      this.options = []
-      this.$nextTick(() => {
-        this.show = false
-      })
-    },
-    initFuse(list) {
-      this.fuse = new Fuse(list, {
-        shouldSort: true,
-        threshold: 0.4,
-        location: 0,
-        distance: 100,
-        maxPatternLength: 32,
-        minMatchCharLength: 1,
-        keys: [
-          {
-            name: 'title',
-            weight: 0.7,
-          },
-          {
-            name: 'path',
-            weight: 0.3,
-          },
-        ],
-      })
-    },
-    // Filter out the routes that can be displayed in the sidebar
-    // And generate the internationalized title
-    generateRoutes(routes, basePath = '/', prefixTitle = []) {
-      let res = []
-
-      for (const router of routes) {
-        // skip hidden router
-        if (router.hidden) {
-          continue
-        }
-
-        const data = {
-          path: path.resolve(basePath, router.path),
-          title: [...prefixTitle],
-        }
-
-        if (router.meta && router.meta.title) {
-          data.title = [...data.title, router.meta.title]
-
-          if (router.redirect !== 'noRedirect') {
-            // only push the routes with title
-            // special case: need to exclude parent router without redirect
-            res.push(data)
-          }
-        }
-
-        // recursive child routes
-        if (router.children) {
-          const tempRoutes = this.generateRoutes(
-            router.children,
-            data.path,
-            data.title
-          )
-          if (tempRoutes.length >= 1) {
-            res = [...res, ...tempRoutes]
-          }
-        }
-      }
-      return res
-    },
-    querySearch(query) {
-      if (query !== '') {
-        this.options = this.fuse.search(query)
-      } else {
-        this.options = []
-      }
-    },
-  },
-}
-</script>
 
 <style lang="scss" scoped>
 .header-search {
@@ -191,3 +59,146 @@ export default {
   }
 }
 </style>
+
+
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import Fuse from 'fuse.js';
+// import path from 'path';
+import { useRouter } from 'vue-router';
+import { useLayout } from '~/layouts/composables/layout';
+const { menuModel } = useLayout();
+
+const router = useRouter();
+const search = ref('');
+const options = ref([]);
+const searchPool = ref([]);
+const show = ref(false);
+let fuse = null;
+
+const generateRoutes = (menuItems, basePath = '/', prefixTitle = []) => {
+  let res = [];
+  for (const menuItem of menuItems) {
+    if (menuItem.items || menuItem.length > 1) {
+      const tempmenuItem = generateRoutes(menuItem.items);
+      // res.push(tempmenuItem);
+      res = [...res, ...tempmenuItem]
+      continue
+    }
+    const data = {
+      path: menuItem.to,
+      title: menuItem.label,
+    };
+    if (menuItem.to){
+      res.push(data);
+    }
+  }
+  return res;
+};
+
+// const generateRoutes = (menuItems, basePath = '/', prefixTitle = []) => {
+//   let res = [];
+//   for (const menuItem of menuItems) {
+//     console.log(menuItem)
+//     for (const menuItemChild of menuItem.items){
+//       const data = {
+//         path: menuItemChild.to,
+//         title: menuItemChild.label,
+//         // label: menuItem.label + menuItemChild.label
+//         // path: path.resolve(basePath, menuItemr.path),
+//         // title: [...prefixTitle].push(menuItemChild.label),
+//       };
+//       // if (menuItemChild.meta && menuItemChild.meta.title) {
+//       //   data.title = [...data.title, menuItem.meta.title];
+  
+//       //   if (menuItem.redirect !== 'noRedirect') {
+//       //     res.push(data);
+//       //   }
+//       // }
+//       if (menuItemChild.to){
+//         res.push(data);
+//       }
+//       if (menuItemChild.items) {
+//         const tempmenuItem = generateRoutes(menuItemChild.items, data.path, [data.title]);
+//         console.log(tempmenuItem)
+//         res.push(tempmenuItem);
+//         // if (tempmenuItem.length >= 1) {
+//         // }
+//       }
+//     }
+//   }
+
+//   console.log(res)
+//   return res;
+// };
+
+const initFuse = (list) => {
+  fuse = new Fuse(list, {
+    shouldSort: true,
+    threshold: 0.4,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      {
+        name: 'title',
+        weight: 0.7,
+      },
+      {
+        name: 'path',
+        weight: 0.3,
+      },
+    ],
+  });
+};
+
+onMounted(() => {
+  searchPool.value = generateRoutes(menuModel.value);
+  initFuse(searchPool.value);
+});
+
+
+// watch(router.getRoutes, () => {
+//   searchPool.value = generateRoutes(router.getRoutes());
+// });
+
+watch(show, (value) => {
+  if (value) {
+    document.body.addEventListener('click', close);
+  } else {
+    document.body.removeEventListener('click', close);
+  }
+});
+
+const close = () => {
+  if (ref.headerSearchSelect) ref.headerSearchSelect.blur();
+  options.value = [];
+  show.value = false;
+};
+
+const click = () => {
+  show.value = !show.value;
+  if (show.value) {
+    ref.headerSearchSelect && ref.headerSearchSelect.focus();
+  }
+};
+
+const change = (val) => {
+  router.push(val.path);
+  search.value = '';
+  options.value = [];
+  nextTick(() => {
+    show.value = false;
+  });
+};
+
+const querySearch = (query) => {
+
+  if (query !== '') {
+    options.value = fuse.search(query);
+  } else {
+    options.value = [];
+  }
+};
+</script>
