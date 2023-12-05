@@ -1,13 +1,5 @@
 <template>
-  <!-- <button class="p-link layout-topbar-button">
-              <i class="pi pi-search"></i>
-              <span>Search</span>
-          </button> -->
-          <div class="p-link layout-topbar-button">
-            <i class="pi pi-search" @click.stop="click"></i>
-          </div>
     <div :class="{'show':show}" class="header-search">
-    <!-- <svg-icon class-name="search-icon" icon-class="search" @click.stop="click" /> -->
       <el-select
       ref="headerSearchSelect"
       v-model="search"
@@ -26,6 +18,9 @@
       :label="item.item.title"
       />
       </el-select>
+  </div>
+  <div class="p-link layout-topbar-button">
+    <i class="pi pi-search" @click.stop="click"></i>
   </div>
 </template>
 
@@ -65,7 +60,7 @@
 
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import Fuse from 'fuse.js';
 // import path from 'path';
 import { useRouter } from 'vue-router';
@@ -78,6 +73,7 @@ const options = ref([]);
 const searchPool = ref([]);
 const show = ref(false);
 let fuse = null;
+const headerSearchSelect = ref(null);
 
 const generateRoutes = (menuItems, basePath = '/', prefixTitle = []) => {
   let res = [];
@@ -99,41 +95,6 @@ const generateRoutes = (menuItems, basePath = '/', prefixTitle = []) => {
   return res;
 };
 
-// const generateRoutes = (menuItems, basePath = '/', prefixTitle = []) => {
-//   let res = [];
-//   for (const menuItem of menuItems) {
-//     console.log(menuItem)
-//     for (const menuItemChild of menuItem.items){
-//       const data = {
-//         path: menuItemChild.to,
-//         title: menuItemChild.label,
-//         // label: menuItem.label + menuItemChild.label
-//         // path: path.resolve(basePath, menuItemr.path),
-//         // title: [...prefixTitle].push(menuItemChild.label),
-//       };
-//       // if (menuItemChild.meta && menuItemChild.meta.title) {
-//       //   data.title = [...data.title, menuItem.meta.title];
-  
-//       //   if (menuItem.redirect !== 'noRedirect') {
-//       //     res.push(data);
-//       //   }
-//       // }
-//       if (menuItemChild.to){
-//         res.push(data);
-//       }
-//       if (menuItemChild.items) {
-//         const tempmenuItem = generateRoutes(menuItemChild.items, data.path, [data.title]);
-//         console.log(tempmenuItem)
-//         res.push(tempmenuItem);
-//         // if (tempmenuItem.length >= 1) {
-//         // }
-//       }
-//     }
-//   }
-
-//   console.log(res)
-//   return res;
-// };
 
 const initFuse = (list) => {
   fuse = new Fuse(list, {
@@ -182,8 +143,11 @@ const close = () => {
 
 const click = () => {
   show.value = !show.value;
+  console.log('clicked')
   if (show.value) {
-    ref.headerSearchSelect && ref.headerSearchSelect.focus();
+    nextTick(() => {
+      if (headerSearchSelect.value) headerSearchSelect.value.focus();
+    });
   }
 };
 
