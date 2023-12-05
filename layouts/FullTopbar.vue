@@ -3,11 +3,14 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
 import Search from '~/components/HeaderSearch';
+import Profile from '~/components/HeaderProfile';
+
 const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const appConfig = useAppConfig()
+
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -19,6 +22,8 @@ onBeforeUnmount(() => {
 //     console.log(appConfig.logoUrl)
 //     return appConfig.logoUrl
 // });
+
+
 
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
@@ -80,22 +85,8 @@ const isOutsideClicked = (event) => {
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <search id="header-search"/>
-            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-search"></i>
-                <span>Search</span>
-            </button> -->
-            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button> -->
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button>
-            <!-- <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
-            </button> -->
+            <profile id="header-profile"/>
+
         </div>
     </div>
 </template>

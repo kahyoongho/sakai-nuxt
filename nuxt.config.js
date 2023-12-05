@@ -3,7 +3,7 @@ export default defineNuxtConfig({
     typescript: false,
     app: {
         head: {
-            title: 'Sakai Vue',
+            title: 'Demo',
             link: [
                 {
                     id: 'theme-css',
@@ -14,7 +14,13 @@ export default defineNuxtConfig({
             ]
         }
     },
-    modules: ['nuxt-primevue', '@element-plus/nuxt'],
+    modules: [
+        'nuxt-primevue', 
+        '@element-plus/nuxt',
+        '@sidebase/nuxt-auth',
+        // '@nuxtjs/tailwindcss',
+        // 'nuxt-icon'
+    ],
     primevue: {
         options: { ripple: true },
         components: {
@@ -37,5 +43,18 @@ export default defineNuxtConfig({
             `
         }
     ],
-    css: ['primeicons/primeicons.css', 'primeflex/primeflex.scss', 'primevue/resources/primevue.min.css', '@/assets/styles.scss']
+    css: ['primeicons/primeicons.css', 'primeflex/primeflex.scss', 'primevue/resources/primevue.min.css', '@/assets/styles.scss'],
+
+
+    auth: {
+        isEnabled: true,
+        baseUrl: process.env.AUTH_ORIGIN,
+        provider: {
+          type: 'authjs'
+        },
+        globalAppMiddleware: {
+          isEnabled: true
+        }
+      }
+
 });
