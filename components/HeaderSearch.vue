@@ -3,12 +3,12 @@
               <i class="pi pi-search"></i>
               <span>Search</span>
           </button> -->
+          <div class="p-link layout-topbar-button">
+            <i class="pi pi-search" @click.stop="click"></i>
+          </div>
     <div :class="{'show':show}" class="header-search">
-      <div class="p-link layout-topbar-button">
-        <i class="pi pi-search" @click.stop="click"></i>
-      </div>
     <!-- <svg-icon class-name="search-icon" icon-class="search" @click.stop="click" /> -->
-    <el-select
+      <el-select
       ref="headerSearchSelect"
       v-model="search"
       :remote-method="querySearch"
@@ -18,26 +18,29 @@
       placeholder="Search"
       class="header-search-select"
       @change="change"
-    >
+      >
       <el-option
-        v-for="item in options"
-        :key="item.item.path"
-        :value="item.item"
-        :label="item.item.title"
+      v-for="item in options"
+      :key="item.item.path"
+      :value="item.item"
+      :label="item.item.title"
       />
-    </el-select>
+      </el-select>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .header-search {
+  display: flex;
+  align-items: center;
   font-size: 0 !important;
 
-  .search-icon {
-    cursor: pointer;
-    font-size: 18px;
-    vertical-align: middle;
-  }
+
+  // .search-icon {
+  //   cursor: pointer;
+  //   font-size: 18px;
+  //   vertical-align: middle;
+  // }
 
   .header-search-select {
     font-size: 18px;
@@ -47,7 +50,7 @@
     background: transparent;
     border-radius: 0;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: middle; // Add this line to vertically align with the icon
 
   }
 
